@@ -10,12 +10,12 @@ services:
       - 8000:8000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - portainer-vol:/data
   # iot services 
   home-assistant:
-    image: homeassistant/raspberrypi4-homeassistant:stable
+    image: homeassistant/raspberrypi4-homeassistant:dev
     volumes:
-      - /home/pi/homeassistant-conf:/config
+      - homeassistant-vol:/config
     environment:
       - TZ=Europe/Moscow
     depends_on:
@@ -42,7 +42,7 @@ services:
     image: "eclipse-mosquitto"
     ports:
       - "1883:1883"
-      - "9001:9001"
+      # - "9001:9001"
     volumes:
       - mqtt-vol:/mosquitto
       - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
@@ -73,11 +73,10 @@ services:
     restart: unless-stopped
 
 volumes:
-  portainer_data:
+  portainer-vol:
   mqtt-vol:
-    external: true
   zigbee-vol:
-    external: true
   nodered-vol:
-    external: true
+  homeassistant-vol:
+  
   

@@ -42,3 +42,9 @@ export SERVER_BACKUP_DIR=/home/pi/backup
  0 2  *   *   *     ~/server/backup.sh server_home-assistant_1 /config
 
 ```
+
+## Actions
+
+```
+docker run --volumes-from $NAME -it --rm alpine
+```
