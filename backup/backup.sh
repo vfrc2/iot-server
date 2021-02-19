@@ -25,7 +25,7 @@ if [ $? -ne 0 ]; then
 fi
 
 docker run -v ${BACKUP_DIR}:/backup --volumes-from $NAME \
-  -it --rm alpine \
+  --rm alpine \
   tar cfvz /backup/${BACKUP_NAME}.tar.gz $BACKUP_LIST
 
 if [ $? -ne 0 ]

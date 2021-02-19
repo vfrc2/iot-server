@@ -11,6 +11,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer-vol:/data
+    environment:
+      - TZ=Europe/Moscow        
   # iot services 
   home-assistant:
     image: homeassistant/raspberrypi4-homeassistant:dev
@@ -55,7 +57,8 @@ services:
       - "/dev/ttyACM0:/dev/ttyACM0"
     restart: unless-stopped
     environment:
-      - 'ZIGBEE2MQTT_CONFIG_MQTT={"base_topic": "zigbee2mqtt", "server":"mqtt://mqtt:1883"}'
+      - 'ZIGBEE2MQTT_CONFIG_MQTT_SERVER="mqtt://mqtt:1883"'
+      - TZ=Europe/Moscow
     depends_on:
       - mqtt
   zigbee2mqttAssistant:
