@@ -44,7 +44,7 @@ services:
     image: "eclipse-mosquitto"
     ports:
       - "1883:1883"
-      # - "9001:9001"
+      - "9001:9001"
     volumes:
       - mqtt-vol:/mosquitto
       - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
@@ -57,7 +57,7 @@ services:
       - "/dev/ttyACM0:/dev/ttyACM0"
     restart: unless-stopped
     environment:
-      - 'ZIGBEE2MQTT_CONFIG_MQTT_SERVER="mqtt://mqtt:1883"'
+      - 'ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mqtt:1883'
       - TZ=Europe/Moscow
     depends_on:
       - mqtt

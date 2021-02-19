@@ -37,9 +37,9 @@ export SERVER_BACKUP_DIR=/home/pi/backup
 
 /var/spool/cron/crontabs/${USER}
 ```
- 10 2  *   *   *     . $HOME/.profile; $HOME/server/backup/backup.sh server_zigbee_1 /app/data
- 12 2  *   *   *     . $HOME/.profile; $HOME/server/backup/backup.sh server_nodered_1 /data
- 14 2  *   *   *     . $HOME/.profile; #HOME/server/backup/backup.sh server_home-assistant_1 /config
+ 10 2  *   *   *     . $HOME/.profile; $HOME/server/backup/backup.sh iot-server_zigbee_1 /app/data
+ 12 2  *   *   *     . $HOME/.profile; $HOME/server/backup/backup.sh iot-server_nodered_1 /data
+ 14 2  *   *   *     . $HOME/.profile; #HOME/server/backup/backup.sh iot-server_home-assistant_1 /config
 
 ```
 
