@@ -22,6 +22,9 @@ services:
       - TZ=Europe/Moscow
     depends_on:
       - mqtt
+#  ZHA? Maybe migrate someday
+#    devices:
+#      - "/dev/ttyACM0:/dev/ttyACM0"
     network_mode: "host"
     restart: unless-stopped
   nodered:
@@ -74,6 +77,24 @@ services:
     ports:
       - 5555:80
     restart: unless-stopped
+  motioneye:
+    image: ccrisan/motioneye:master-armhf
+    ports:
+      - 5000:8765
+      - 8081:8081
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Moscow
+  wiki:
+    image: arpaulnet/gollum
+    ports:
+      - 80:4567
+    volumes:
+      - wiki-vol:/wiki
+    command: gollum --allow-uploads dir --h1-title
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Moscow
 
 volumes:
   portainer-vol:
@@ -81,5 +102,6 @@ volumes:
   zigbee-vol:
   nodered-vol:
   homeassistant-vol:
+  wiki-vol:
   
   
