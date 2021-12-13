@@ -15,11 +15,12 @@ services:
       - TZ=Europe/Moscow        
   # iot services 
   home-assistant:
-    image: homeassistant/raspberrypi4-homeassistant:dev
+    image: homeassistant/raspberrypi4-homeassistant:stable
     volumes:
       - homeassistant-vol:/config
     environment:
       - TZ=Europe/Moscow
+    privileged: true
     depends_on:
       - mqtt
 #  ZHA? Maybe migrate someday
