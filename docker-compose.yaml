@@ -2,7 +2,7 @@ version: "3.8"
 services:
   # System services
   portainer:
-    image: portainer/portainer
+    image: portainer/portainer-ce
     command: -H unix:///var/run/docker.sock
     restart: always
     ports:
@@ -28,6 +28,18 @@ services:
 #      - "/dev/ttyACM0:/dev/ttyACM0"
     network_mode: "host"
     restart: unless-stopped
+  hass-configurator:
+    image: "causticlab/hass-configurator-docker:latest"
+    restart: always
+    ports:
+      - "3218:3218/tcp"
+    privileged: true
+    environment:
+      - HC_HASS_API=http://home-assistant:8123/api/
+      - HC_HASS_WS_API=wss://home-assistant:8123/api/websocket
+    volumes:
+      - "./config/hass-configurator.settings.conf:/config/settings.conf"
+      - "homeassistant-vol:/hass-config"
   nodered:
     image: nodered/node-red
     ports:
@@ -57,33 +69,26 @@ services:
     image: koenkk/zigbee2mqtt
     volumes:
       - zigbee-vol:/app/data
+    ports:
+      - "8080:8080"
     devices:
       - "/dev/ttyACM0:/dev/ttyACM0"
     restart: unless-stopped
     environment:
       - 'ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mqtt:1883'
+      - 'ZIGBEE2MQTT_CONFIG_HOMEASSISTANT=true'
       - TZ=Europe/Moscow
     depends_on:
       - mqtt
-  zigbee2mqttAssistant:
-    image: carldebilly/zigbee2mqttassistant
-    environment:
-      - Z2MA_SETTINGS__MQTTSERVER=mqtt
-      # Set to your TimeZone when using on Linux https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-      # Won't work if you're using the Windows version of the container
-      - TZ=Europe/Moscow
-    depends_on:
-      - mqtt
-      - zigbee
-    ports:
-      - 5555:80
-    restart: unless-stopped
   motioneye:
     image: ccrisan/motioneye:master-armhf
     ports:
       - 5000:8765
       - 8081:8081
     restart: unless-stopped
+    volumes:
+      - motion-vol:/etc/motion
+      - motion-var-vol:/var/lib/motioneye
     environment:
       - TZ=Europe/Moscow
   wiki:
@@ -104,5 +109,7 @@ volumes:
   nodered-vol:
   homeassistant-vol:
   wiki-vol:
+  motion-vol:
+  motion-var-vol:
   
   
