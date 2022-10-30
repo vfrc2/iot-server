@@ -13,6 +13,17 @@ services:
       - portainer-vol:/data
     environment:
       - TZ=Europe/Moscow        
+  wiki:
+    image: arpaulnet/gollum
+    ports:
+      - 80:4567
+    volumes:
+      - wiki-vol:/wiki
+    command: gollum --allow-uploads dir --h1-title
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Moscow
+
   # iot services 
   home-assistant:
     image: homeassistant/raspberrypi4-homeassistant:stable
@@ -23,9 +34,6 @@ services:
     privileged: true
     depends_on:
       - mqtt
-#  ZHA? Maybe migrate someday
-#    devices:
-#      - "/dev/ttyACM0:/dev/ttyACM0"
     network_mode: "host"
     restart: unless-stopped
   hass-configurator:
@@ -47,8 +55,10 @@ services:
     volumes:
       - nodered-vol:/data
       - /etc/localtime:/etc/localtime
+      # - /home/pi/dev:/dev
     depends_on:
       - mqtt
+      - influxdb
     privileged: true
     cap_add:
       - SYS_ADMIN
@@ -72,7 +82,7 @@ services:
     ports:
       - "8080:8080"
     devices:
-      - "/dev/ttyACM0:/dev/ttyACM0"
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
     restart: unless-stopped
     environment:
       - 'ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mqtt:1883'
@@ -80,27 +90,59 @@ services:
       - TZ=Europe/Moscow
     depends_on:
       - mqtt
-  motioneye:
-    image: ccrisan/motioneye:master-armhf
+  
+  influxdb:
+    image: arm32v7/influxdb:latest
     ports:
-      - 5000:8765
-      - 8081:8081
-    restart: unless-stopped
+      - '8086:8086'
     volumes:
-      - motion-vol:/etc/motion
-      - motion-var-vol:/var/lib/motioneye
-    environment:
-      - TZ=Europe/Moscow
-  wiki:
-    image: arpaulnet/gollum
-    ports:
-      - 80:4567
-    volumes:
-      - wiki-vol:/wiki
-    command: gollum --allow-uploads dir --h1-title
+      - influxdb-vol:/var/lib/influxdb
     restart: unless-stopped
     environment:
-      - TZ=Europe/Moscow
+      - INFLUXDB_DB=db0
+      # - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
+      # - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_PASSWORD}
+  chronograf:
+    image: chronograf:latest
+    ports:
+      - '8888:8888'
+    volumes:
+      - chronograf-vol:/var/lib/chronograf
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+      # - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
+      # - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-vol:/var/lib/grafana
+      - ./grafana-provisioning/:/etc/grafana/provisioning
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+    # environment:
+      # - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
+      # - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+  # over
+
+
+  
+  # motioneye:
+  #   image: ccrisan/motioneye:master-armhf
+  #   ports:
+  #     - 5000:8765
+  #     - 8081:8081
+  #   restart: unless-stopped
+  #   volumes:
+  #     - motion-vol:/etc/motion
+  #     - motion-var-vol:/var/lib/motioneye
+  #   environment:
+  #     - TZ=Europe/Moscow
 
 volumes:
   portainer-vol:
@@ -111,5 +153,8 @@ volumes:
   wiki-vol:
   motion-vol:
   motion-var-vol:
+  influxdb-vol:
+  chronograf-vol:
+  grafana-vol:
   
   
