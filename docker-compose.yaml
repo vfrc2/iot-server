@@ -90,7 +90,6 @@ services:
       - TZ=Europe/Moscow
     depends_on:
       - mqtt
-  
   influxdb:
     image: arm32v7/influxdb:latest
     ports:
@@ -103,7 +102,7 @@ services:
       # - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
       # - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_PASSWORD}
   chronograf:
-    image: chronograf:latest
+    image: chronograf:1.8
     ports:
       - '8888:8888'
     volumes:
@@ -128,6 +127,17 @@ services:
     # environment:
       # - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
       # - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+  kapacitor:
+    image: "arm32v7/kapacitor:latest"
+    ports:
+      - '9092:9092'
+    depends_on:
+      - influxdb
+    environment:
+      - KAPACITOR_INFLUXDB_0_URLS_0=http://influxdb:8086
+    restart: unless-stopped
+    volumes:
+      - kapacitor-vol:/var/lib/kapacitor
   # over
 
 
@@ -156,5 +166,6 @@ volumes:
   influxdb-vol:
   chronograf-vol:
   grafana-vol:
+  kapacitor-vol:
   
   
