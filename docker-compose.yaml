@@ -26,7 +26,7 @@ services:
 
   # iot services 
   home-assistant:
-    image: homeassistant/raspberrypi4-homeassistant:stable
+    image: homeassistant/home-assistant:latest
     volumes:
       - homeassistant-vol:/config
     environment:
@@ -91,7 +91,7 @@ services:
     depends_on:
       - mqtt
   influxdb:
-    image: arm32v7/influxdb:latest
+    image: arm64v8/influxdb:latest
     ports:
       - '8086:8086'
     volumes:
@@ -101,19 +101,6 @@ services:
       - INFLUXDB_DB=db0
       # - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
       # - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_PASSWORD}
-  chronograf:
-    image: chronograf:1.8
-    ports:
-      - '8888:8888'
-    volumes:
-      - chronograf-vol:/var/lib/chronograf
-    depends_on:
-      - influxdb
-    restart: unless-stopped
-    environment:
-      - INFLUXDB_URL=http://influxdb:8086
-      # - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
-      # - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
   grafana:
     image: grafana/grafana:latest
     ports:
@@ -127,20 +114,7 @@ services:
     # environment:
       # - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
       # - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-  kapacitor:
-    image: "arm32v7/kapacitor:latest"
-    ports:
-      - '9092:9092'
-    depends_on:
-      - influxdb
-    environment:
-      - KAPACITOR_INFLUXDB_0_URLS_0=http://influxdb:8086
-    restart: unless-stopped
-    volumes:
-      - kapacitor-vol:/var/lib/kapacitor
   # over
-
-
   
   # motioneye:
   #   image: ccrisan/motioneye:master-armhf
